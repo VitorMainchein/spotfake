@@ -16,7 +16,7 @@ const RegisterScreen = ({ navigation }) => {
     }
 
     try {
-      const response = await fetch('http://localhost:8000/registro', {
+      const response = await fetch('http://localhost:8000/autenticacao/registro', {
         method: 'POST',
         headers: {
           Accept: 'application/json',
@@ -35,7 +35,7 @@ const RegisterScreen = ({ navigation }) => {
         window.alert('ERRO: Usuário já cadastrado!');
       } else if (response.status === 406) {
         window.alert('ERRO: Preencha todos os campos!');
-      } else if (response.status === 201) {
+      } else if (response.status === 200) {
         navigation.navigate('Home');
       } else {
         window.alert('ERRO: Ocorreu um erro inesperado');

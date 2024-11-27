@@ -5,6 +5,7 @@ import SplashScreen from './splashScreen';
 import LoginScreen from './telaLogin';
 import RegisterScreen from './telaCadastro';
 import HomeScreen from './telaHome';
+import PerfilScreen from './telaPerfil';
 
 const Stack = createStackNavigator();
 
@@ -16,6 +17,7 @@ const App = () => {
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Register" component={RegisterScreen} />
         <Stack.Screen name="Home" component={HomeScreen} />
+        <Stack.Screen name="Perfil" component={PerfilScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
