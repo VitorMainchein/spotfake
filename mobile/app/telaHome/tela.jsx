@@ -26,37 +26,16 @@ export default function HomeScreen({ navigation }) {
     {
       id: '1',
       title: 'Lets Go 5',
-      artist: 'Mc Ryan SP, Mc Ig',
+      artist: 'Mc Ryan SP, Dj Guuga',
       cover: 'https://i.scdn.co/image/ab67616d00001e02db20916e7afa9e7c3025b6b1',
       duration: '2:30',
     },
     {
       id: '2',
       title: 'Terapia',
-      artist: 'Mc Kevin',
+      artist: 'Igor Guilherme, Mc Don Juan',
       cover: 'https://i.scdn.co/image/ab67616d0000b27330221d7fa0f07da1198dad93',
       duration: '3:15',
-    },
-    {
-      id: '3',
-      title: 'Fernando de Noronha',
-      artist: 'Mc ig, Mc Ryan SP, Mc PH',
-      cover: 'https://cdn-images.dzcdn.net/images/cover/2c5215c670952bb3879d0a790b7a9fc8/0x1900-000000-80-0-0.jpg',
-      duration: '4:05',
-    },
-    {
-      id: '4',
-      title: 'Noite Carioca',
-      artist: 'Mc Ig, Mc Ryan SP',
-      cover: 'https://cdn-images.dzcdn.net/images/cover/5c04758d86aefac7b7e4d7b615744ace/0x1900-000000-80-0-0.jpg',
-      duration: '3:50',
-    },
-    {
-      id: '5',
-      title: 'Passar de Foguetão',
-      artist: 'Mc Don Juan, Mc Kevin',
-      cover: 'https://i.scdn.co/image/ab67616d0000b273772902a9ecae8bb9033706c1',
-      duration: '3:20',
     },
   ];
 
@@ -70,19 +49,14 @@ export default function HomeScreen({ navigation }) {
     setModalVisible(false);
   };
 
-  const renderPlaylistItem = ({ item }) => {
-    // Encontrar a música correspondente na lista de músicas
-    const song = songs.find(song => song.title === item.title);
-
-    return (
-      <TouchableOpacity onPress={() => openMusicCard(song)}>
-        <View style={styles.playlistItem}>
-          <Image source={{ uri: item.cover }} style={styles.playlistImage} />
-          <Text style={styles.playlistTitle}>{item.title}</Text>
-        </View>
-      </TouchableOpacity>
-    );
-  };
+  const renderPlaylistItem = ({ item }) => (
+    <TouchableOpacity onPress={() => openMusicCard({ ...item, artist: 'Artista Desconhecido', duration: '3:45' })}>
+      <View style={styles.playlistItem}>
+        <Image source={{ uri: item.cover }} style={styles.playlistImage} />
+        <Text style={styles.playlistTitle}>{item.title}</Text>
+      </View>
+    </TouchableOpacity>
+  );
 
   return (
     <View style={styles.container}>
@@ -99,15 +73,6 @@ export default function HomeScreen({ navigation }) {
 
       {/* Scrollable Content */}
       <ScrollView contentContainerStyle={styles.contentContainer}>
-        <View style={styles.quickPlayContainer}>
-          {playlists.slice(0, 6).map((item) => (
-            <View key={item.id} style={styles.quickPlayItem}>
-              <Image source={{ uri: item.cover }} style={styles.quickPlayImage} />
-              <Text style={styles.quickPlayTitle}>{item.title}</Text>
-            </View>
-          ))}
-        </View>
-
         <Text style={styles.sectionTitle}>Tocadas Recentemente</Text>
         <FlatList
           data={recentlyPlayed}
@@ -178,34 +143,6 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     color: '#00bcd4',
-  },
-  quickPlayContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    marginHorizontal: 16,
-    marginBottom: 20,
-  },
-  quickPlayItem: {
-    width: '48%',
-    backgroundColor: '#282828',
-    borderRadius: 8,
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 10,
-    padding: 10,
-    borderWidth: 1,
-  },
-  quickPlayImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 8,
-  },
-  quickPlayTitle: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '500',
-    marginLeft: 10,
   },
   sectionTitle: {
     fontSize: 18,
