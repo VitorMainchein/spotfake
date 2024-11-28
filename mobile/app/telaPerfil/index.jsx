@@ -1,28 +1,117 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import React, { useState } from 'react';
+import * as ImagePicker from 'expo-image-picker';
+import { View, Text, TouchableOpacity, StyleSheet, Image, Modal, TextInput, Alert } from 'react-native';
 
 const ProfileScreen = ({ navigation }) => {
+  const [image, setImage] = useState(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+
+  const getImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+    if (!result.canceled) {
+      setImage(result.assets[0].uri);
+      handleSetImage(result.assets[0].uri)
+    }
+  };
+
+  const handleSetImage = async (url) => {
+    try {
+        const data = {
+            "file": url,
+            "upload_preset": 'ml_default',
+        };
+            const res = await fetch('https://api.cloudinary.com/v1_1/dtrobjlkz/upload', {
+            method: 'POST',
+            headers: {
+                'content-type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+        const result = await res.json();
+        console.log(result.url)
+    } catch (error) {
+        console.err(error);
+    }
+};
+
+  const toggleModal = () => {
+    setIsModalVisible(!isModalVisible);
+  };
+
+  const handlePasswordChange = () => {
+    if (newPassword !== confirmPassword) {
+      Alert.alert('Erro', 'As senhas não coincidem!');
+      return;
+    }
+    Alert.alert('Sucesso', 'Senha alterada com sucesso!');
+    toggleModal();
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Perfil do Usuário</Text>
-      <View style={styles.avatarContainer}>
-        <View style={styles.avatar}>
-          <Text style={styles.avatarText}>150 x 150</Text>
-        </View>
-      </View>
-      <Text style={styles.username}>Nome do Usuário</Text>
-      <Text style={styles.email}>usuario@exemplo.com</Text>
+      <TouchableOpacity onPress={getImage} style={styles.avatarContainer}>
+        {image ? (
+          <Image source={{ uri: image }} style={styles.avatar} />
+        ) : (
+          <View style={styles.avatar}>
+            <Text style={styles.avatarText}>Foto</Text>
+          </View>
+        )}
+      </TouchableOpacity>
+      <Text style={styles.username}>Vitor Mainchein</Text>
+      <Text style={styles.email}>vitor@gmail.com</Text>
 
-      <TouchableOpacity style={styles.button}>
+      <TouchableOpacity style={styles.button} onPress={getImage}>
         <Text style={styles.buttonText}>Editar Perfil</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.button}>
+
+      <TouchableOpacity style={styles.button} onPress={toggleModal}>
         <Text style={styles.buttonText}>Alterar Senha</Text>
       </TouchableOpacity>
-      
+
       <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Login')}>
         <Text style={styles.buttonText}>Sair</Text>
       </TouchableOpacity>
+
+      <Modal
+        visible={isModalVisible}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={toggleModal}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Alterar Senha</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Nova Senha"
+              secureTextEntry
+              value={newPassword}
+              onChangeText={setNewPassword}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Confirmar Senha"
+              secureTextEntry
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+            />
+            <TouchableOpacity style={styles.modalButton} onPress={handlePasswordChange}>
+              <Text style={styles.buttonText}>Alterar Senha</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.modalButton} onPress={toggleModal}>
+              <Text style={styles.buttonText}>Cancelar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -80,6 +169,43 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+
+  // Estilos da Modal
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    width: '80%',
+    backgroundColor: '#fff',
+    padding: 20,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#00bcd4',
+    marginBottom: 16,
+  },
+  input: {
+    width: '100%',
+    padding: 12,
+    marginVertical: 8,
+    backgroundColor: '#f0f0f0',
+    borderRadius: 8,
+    fontSize: 16,
+  },
+  modalButton: {
+    width: '80%',
+    paddingVertical: 12,
+    backgroundColor: '#00bcd4',
+    borderRadius: 8,
+    alignItems: 'center',
+    marginVertical: 8,
   },
 });
 
