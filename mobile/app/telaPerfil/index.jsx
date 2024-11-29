@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import * as ImagePicker from 'expo-image-picker';
 import { View, Text, TouchableOpacity, StyleSheet, Image, Modal, TextInput, Alert } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ProfileScreen = ({ navigation }) => {
   const [image, setImage] = useState(null);
+  const [email, setEmail] = useState('')
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -23,36 +25,63 @@ const ProfileScreen = ({ navigation }) => {
 
   const handleSetImage = async (url) => {
     try {
-        const data = {
-            "file": url,
-            "upload_preset": 'ml_default',
-        };
-            const res = await fetch('https://api.cloudinary.com/v1_1/dtrobjlkz/upload', {
-            method: 'POST',
-            headers: {
-                'content-type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        });
-        const result = await res.json();
-        console.log(result.url)
+      const data = {
+        "file": url,
+        "upload_preset": 'ml_default',
+      };
+      const res = await fetch('https://api.cloudinary.com/v1_1/dtrobjlkz/upload', {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      });
+      const result = await res.json();
+      console.log(result.url)
     } catch (error) {
-        console.err(error);
+      console.err(error);
     }
-};
+  };
 
   const toggleModal = () => {
     setIsModalVisible(!isModalVisible);
   };
 
-  const handlePasswordChange = () => {
+  const handlePasswordChange = async () => {
     if (newPassword !== confirmPassword) {
       Alert.alert('Erro', 'As senhas não coincidem!');
       return;
     }
-    Alert.alert('Sucesso', 'Senha alterada com sucesso!');
-    toggleModal();
+    try {
+      const resposta = await fetch(`http://localhost:8000/autenticacao/${email}/nova_senha`, {
+        method: 'PUT',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ senha: newPassword })
+      });
+      toggleModal();
+    } catch (error) {
+      console.error('ERROR:', error)
+    }
+    
   };
+
+  const getData = async () => {
+    try {
+      const value = await AsyncStorage.getItem('email');
+      if (value !== null) {
+        setEmail(value)
+      }
+    } catch (e) {
+      console.log(e)
+    }
+  };
+
+  useEffect(() => {
+    getData()
+  }, [])
 
   return (
     <View style={styles.container}>

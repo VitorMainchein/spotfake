@@ -1,5 +1,6 @@
 import React, { useState } from 'react'; 
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -30,6 +31,7 @@ const LoginScreen = ({ navigation }) => {
         window.alert('ERRO: Senha incorreta!');
         return
       } else if (response.status === 200) {
+        storeData(email)
         navigation.navigate('Home');
       } else if (response.status === 500) {
         window.alert('ERRO: Ocorreu um erro inesperado');
@@ -41,6 +43,14 @@ const LoginScreen = ({ navigation }) => {
     } catch (error) {
       window.alert('ERRO: Não foi possível conectar ao servidor');
       return
+    }
+  };
+
+  const storeData = async (value) => {
+    try {
+      await AsyncStorage.setItem('email', value);
+    } catch (e) {
+      console.log(e)
     }
   };
 
